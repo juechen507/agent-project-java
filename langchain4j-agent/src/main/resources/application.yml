@@ -16,7 +16,9 @@ spring:
 # ===================================================================
 agent:
   # ---------- 接入地址与密钥 ----------
-  base-url: ${AGENT_BASE_URL:https://dashscope.aliyuncs.com/compatible-mode/v1}
+  # langchain4j中访问OpenAi接口时，url并没有补充“/v1”部分（见DefaultOpenAiClient部分）
+  # 故这里为了避免使用环境变量，重新定义了一个2
+  base-url2: https://dashscope.aliyuncs.com/compatible-mode/v1
   api-key: ${AGENT_API_KEY:sk-please-set-your-api-key}
 
   # ---------- 对话模型 ----------
