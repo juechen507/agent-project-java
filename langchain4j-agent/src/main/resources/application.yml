@@ -1,0 +1,40 @@
+server:
+  port: 8082
+
+spring:
+  application:
+    name: langchain4j-agent
+
+# ===================================================================
+# LangChain4j 侧 API 配置（自定义 agent.* 前缀，由 AgentModelConfig 用 @Value 读取）
+# -------------------------------------------------------------------
+# 每项都是 ${环境变量:默认值} 形式；改默认值或设环境变量均可（见根目录 .env.example）。
+# 注意：LangChain4j 的 base-url 需要带到 /v1（它会直接拼接 /chat/completions、/embeddings）。
+#   DashScope : https://dashscope.aliyuncs.com/compatible-mode/v1
+#   DeepSeek  : https://api.deepseek.com/v1   （无 embeddings，RAG 需另配）
+#   OpenAI    : https://api.openai.com/v1
+# ===================================================================
+agent:
+  # ---------- 接入地址与密钥 ----------
+  base-url: ${AGENT_BASE_URL:https://dashscope.aliyuncs.com/compatible-mode/v1}
+  api-key: ${AGENT_API_KEY:sk-please-set-your-api-key}
+
+  # ---------- 对话模型 ----------
+  chat-model: ${AGENT_CHAT_MODEL:qwen-plus}
+  temperature: ${AGENT_TEMPERATURE:0.7}       # 采样温度 0~2
+  top-p: ${AGENT_TOP_P:1.0}                   # 核采样
+  max-tokens: ${AGENT_MAX_TOKENS:2048}        # 单次回复最大 token 数
+  timeout-seconds: ${AGENT_TIMEOUT_SECONDS:60} # 单次请求超时
+  max-retries: ${AGENT_MAX_RETRIES:2}          # 失败重试次数
+
+  # ---------- 嵌入模型（RAG 用） ----------
+  embedding-model: ${AGENT_EMBEDDING_MODEL:text-embedding-v3}
+  embedding-dimension: ${AGENT_EMBEDDING_DIM:1024}
+
+  # ---------- 调试：打印大模型原始请求/响应 ----------
+  log-requests: ${AGENT_LOG_REQUESTS:true}
+  log-responses: ${AGENT_LOG_RESPONSES:true}
+
+logging:
+  level:
+    com.example.lc4j: DEBUG

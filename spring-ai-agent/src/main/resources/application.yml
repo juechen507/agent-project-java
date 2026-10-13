@@ -1,0 +1,44 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: spring-ai-agent
+  ai:
+    openai:
+      # ===================================================================
+      # Spring AI 侧 API 配置（OpenAI 兼容协议，适用 DashScope / DeepSeek / OpenAI 官方等）
+      # -------------------------------------------------------------------
+      # 每个配置项都是 ${环境变量:默认值} 形式：
+      #   - 想走环境变量：参考根目录 .env.example 设置后 source 加载；
+      #   - 想直接写死：把冒号后的默认值改成你的值即可（注意别提交真实 Key）。
+      # 服务商示例：
+      #   DashScope : base-url=https://dashscope.aliyuncs.com/compatible-mode/v1  chat=qwen-plus      embedding=text-embedding-v3
+      #   DeepSeek  : base-url=https://api.deepseek.com                          chat=deepseek-chat  （无 embeddings，RAG 需另配）
+      #   OpenAI    : base-url=https://api.openai.com                            chat=gpt-4o-mini    embedding=text-embedding-3-small
+      # ===================================================================
+      api-key: ${AGENT_API_KEY:sk-please-set-your-api-key}
+      base-url: ${AGENT_BASE_URL:https://dashscope.aliyuncs.com/compatible-mode}
+
+      # ---------- 对话模型 ----------
+      chat:
+        options:
+          model: ${AGENT_CHAT_MODEL:qwen-plus}
+          temperature: ${AGENT_TEMPERATURE:0.7}          # 采样温度，0~2，越大越随机
+          top-p: ${AGENT_TOP_P:1.0}                      # 核采样
+          max-tokens: ${AGENT_MAX_TOKENS:2048}           # 单次回复最大 token 数
+        # 说明：Spring AI 的 HTTP 连接/读取超时不是 yaml 配置项，需通过自定义
+        #       RestClient.Builder / WebClient.Builder Bean 设置（属进阶主题，本项目未展开）。
+
+      # ---------- 嵌入模型（RAG 用） ----------
+      embedding:
+        options:
+          model: ${AGENT_EMBEDDING_MODEL:text-embedding-v3}
+          # DashScope text-embedding-v3 默认 1024 维；OpenAI text-embedding-3-small 为 1536 维
+          dimensions: ${AGENT_EMBEDDING_DIM:1024}
+
+logging:
+  level:
+    # 打开框架内部日志，学习时观察请求/响应/工具调用过程
+    org.springframework.ai: DEBUG
+    com.example.springai: DEBUG

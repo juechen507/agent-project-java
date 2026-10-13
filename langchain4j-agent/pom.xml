@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.example.agent</groupId>
+        <artifactId>agent-project-java</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>langchain4j-agent</artifactId>
+    <name>langchain4j-agent</name>
+    <description>LangChain4j 侧示例：AiServices / Tool / ChatMemory / RAG（端口 8082）</description>
+
+    <dependencies>
+        <!-- Web：提供 REST 接口来观察 Agent 行为 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <!-- reactor-core：把 LangChain4j 的流式回调桥接成 SSE（Flux） -->
+        <dependency>
+            <groupId>io.projectreactor</groupId>
+            <artifactId>reactor-core</artifactId>
+        </dependency>
+
+        <!-- LangChain4j 核心：AiServices / ChatMemory / RAG 抽象（框架中立，不依赖 Spring） -->
+        <dependency>
+            <groupId>dev.langchain4j</groupId>
+            <artifactId>langchain4j</artifactId>
+        </dependency>
+        <!-- OpenAI 兼容模型实现：OpenAiChatModel / OpenAiEmbeddingModel，用于对接 DashScope/DeepSeek -->
+        <dependency>
+            <groupId>dev.langchain4j</groupId>
+            <artifactId>langchain4j-open-ai</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <!-- 与 spring-ai 模块共用仓库根目录 docs/knowledge-base.md，打进 classpath:data/ -->
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+            </resource>
+            <resource>
+                <directory>${project.basedir}/../docs</directory>
+                <targetPath>data</targetPath>
+                <includes>
+                    <include>knowledge-base.md</include>
+                </includes>
+            </resource>
+        </resources>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+</project>
