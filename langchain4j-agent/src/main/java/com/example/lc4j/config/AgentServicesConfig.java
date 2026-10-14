@@ -24,6 +24,7 @@ public class AgentServicesConfig {
 
     /** 能力1+2：基础多轮对话（带记忆） */
     @Bean
+    /* 生成proxy对象 */
     public ChatAssistant chatAssistant(ChatModel chatModel) {
         return AiServices.builder(ChatAssistant.class)
                 .chatModel(chatModel)

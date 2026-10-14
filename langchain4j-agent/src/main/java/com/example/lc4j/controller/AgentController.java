@@ -53,19 +53,23 @@ public class AgentController {
 
     /** 概念1：基础对话（用固定会话键 "default"，其实也会累积记忆） */
     @GetMapping("/chat")
-    public String chat(@RequestParam String message) {
+    /*
+        实际执行调用的是proxy对象，具体逻辑见DefaultAiServices...invoke(..) 方法
+     */
+    public String chat(@RequestParam("message") String message) {
         return chatAssistant.chat("default", message);
     }
 
     /** 概念2：多轮对话记忆 —— sessionId 相同即共享同一段 ChatMemory */
     @GetMapping("/chat/memory")
-    public String chatWithMemory(@RequestParam String sessionId, @RequestParam String message) {
+    public String chatWithMemory(@RequestParam("sessionId") String sessionId,
+                                 @RequestParam("message") String message) {
         return chatAssistant.chat(sessionId, message);
     }
 
     /** 概念3：流式输出 —— 用 StreamingChatModel 把回调桥接成 SSE（Flux）逐 token 推送 */
     @GetMapping(value = "/chat/stream", produces = "text/event-stream;charset=UTF-8")
-    public Flux<String> chatStream(@RequestParam String message) {
+    public Flux<String> chatStream(@RequestParam("message") String message) {
         Sinks.Many<String> sink = Sinks.many().unicast().onBackpressureBuffer();
         streamingChatModel.chat(message, new StreamingChatResponseHandler() {
             @Override
@@ -89,20 +93,21 @@ public class AgentController {
 
     /** 概念4：工具调用 —— ToolAssistant 装配时注册了工具，模型按需调用 */
     @GetMapping("/chat/tool")
-    public String chatWithTools(@RequestParam String sessionId, @RequestParam String message) {
+    public String chatWithTools(@RequestParam("sessionId") String sessionId,
+                                @RequestParam("message") String message) {
         return toolAssistant.chat(sessionId, message);
     }
 
     /** 概念5：RAG —— RagAssistant 挂了 RetrievalAugmentor，自动检索知识库再作答 */
     @GetMapping("/rag")
-    public String rag(@RequestParam String question) {
+    public String rag(@RequestParam("question") String question) {
         return ragAssistant.answer(question);
     }
 
     /** 调试利器：跳过 LLM，直接看向量检索命中了哪些文本块 */
     @GetMapping("/search")
-    public List<String> search(@RequestParam String q,
-                               @RequestParam(defaultValue = "4") int topK) {
+    public List<String> search(@RequestParam("q") String q,
+                               @RequestParam(value = "top-k", defaultValue = "4") int topK) {
         var queryEmbedding = embeddingModel.embed(q).content();
         List<EmbeddingMatch<TextSegment>> matches = embeddingStore.search(
                 EmbeddingSearchRequest.builder()
